@@ -1,0 +1,19 @@
+---
+- name: Install node and npm
+  hosts: 146.190.241.233
+  tasks:
+    - name: Update apy repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: Install nodejs and npm
+      apt:
+        pkg:
+          - nodejs
+          - npm
+
+- name: Deploy nodejs app
+  hosts: 146.190.241.233
+  tasks: 
+    - name: Unpack the nodejs file
+      unarchive:
+        src: /Users/mahtazare/Documents/Learning/devops_bootcamp/react-nodejs-example/api/react-nodejs-example-1.0.0.tgz
+        dest: /root/
