@@ -1,12 +1,37 @@
 ---
 - name: Install java and net-tools
-  hosts:
+  hosts: 167.99.186.52
   tasks:
     - name: Update app repo and cache
       apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
     - name: Install java 21
-      apt: name=openjdk-8-jre-headless
+      apt: name=openjdk-21-jre-headless
     - name: Install net-tools
       apt: name=net-tools
 
-- name:
+- name: Download and unpack nexus installer
+  hosts: 167.99.186.52
+  tasks:
+    - name: Download nexus
+      get_url: 
+        url: https://download.sonatype.com/nexus/3/nexus-3.88.0-08-linux-x86_64.tar.gz
+        dest: /opt/
+      register: download_result
+    - name: Unarchive nexus installer
+      unarchive:
+        src: "{{download_result.dest}}"
+        dest: /opt/
+        remote_src: yes
+    - name: Find nexus folder
+      find:
+        paths: /opt
+        pattern: "nexus-*"
+        file_type: directory
+      register: find_result
+    - name: Check if nexus folder exists
+      stat: 
+        path: /opt/nexus
+      register: stat_result 
+    - name: Rename nexus folder
+      shell: mv {{find_result.files[0].path}} /opt/nexus
+      when: not stat_result.stat.exists
