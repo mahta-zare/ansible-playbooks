@@ -10,19 +10,30 @@
           - nodejs
           - npm
 
+- name: Create new linux user to run node js app
+  hosts: 146.190.241.233
+  tasks:
+    - name: Create linux user
+      user:
+        name: mahta
+        comment: Mahta user
+        group: admin
+
 - name: Deploy nodejs app
   hosts: 146.190.241.233
+  become: True
+  become_user: mahta
   tasks: 
     - name: Unpack the nodejs file
       unarchive:
         src: /Users/mahtazare/Documents/Learning/devops_bootcamp/react-nodejs-example/api/react-nodejs-example-1.0.0.tgz
-        dest: /root/
+        dest: /home/mahta/
     - name: Install dependencies
       npm:
-        path: /root/package
+        path: /home/mahta/package
     - name: Start the application
       command:
-        chdir: /root/package/app
+        chdir: /home/mahta/package/app
         cmd: node server
       async: 1000
       poll: 0
@@ -30,4 +41,4 @@
       shell: ps aux | grep node
       register: app_status
     - debug: msg={{ app_status.stdout_lines }}
-    
+
