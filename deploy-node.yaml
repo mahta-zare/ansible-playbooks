@@ -2,7 +2,7 @@
 - name: Install node and npm
   hosts: 146.190.241.233
   tasks:
-    - name: Update apy repo and cache
+    - name: Update app repo and cache
       apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
     - name: Install nodejs and npm
       apt:
@@ -15,25 +15,27 @@
   tasks:
     - name: Create linux user
       user:
-        name: mahta
-        comment: Mahta user
+        name: "{{linux_name}}"
+        comment: Node user
         group: admin
 
 - name: Deploy nodejs app
   hosts: 146.190.241.233
   become: True
-  become_user: mahta
+  become_user: "{{linux_name}}"
+  vars: 
+    user_home_dir: /home/{{linux_name}}
   tasks: 
     - name: Unpack the nodejs file
       unarchive:
-        src: /Users/mahtazare/Documents/Learning/devops_bootcamp/react-nodejs-example/api/react-nodejs-example-1.0.0.tgz
-        dest: /home/mahta/
+        src: "{{location}}/react-nodejs-example-{{version}}.tgz"
+        dest: "{{user_home_dir}}"
     - name: Install dependencies
       npm:
-        path: /home/mahta/package
+        path: "{{user_home_dir}}/package"
     - name: Start the application
       command:
-        chdir: /home/mahta/package/app
+        chdir: "{{user_home_dir}}/package/app"
         cmd: node server
       async: 1000
       poll: 0
