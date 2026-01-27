@@ -12,6 +12,8 @@
 
 - name: Create new linux user to run node js app
   hosts: 146.190.241.233
+  vars_files:
+    - project-vars
   tasks:
     - name: Create linux user
       user:
@@ -23,8 +25,8 @@
   hosts: 146.190.241.233
   become: True
   become_user: "{{linux_name}}"
-  vars: 
-    user_home_dir: /home/{{linux_name}}
+  vars_files:
+    - project-vars
   tasks: 
     - name: Unpack the nodejs file
       unarchive:

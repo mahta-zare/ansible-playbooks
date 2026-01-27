@@ -1,0 +1,4 @@
+linux_name: mahta
+location: /Users/mahtazare/Documents/Learning/devops_bootcamp/react-nodejs-example/api
+version: 1.0.0
+user_home_dir: /home/{{linux_name}}
