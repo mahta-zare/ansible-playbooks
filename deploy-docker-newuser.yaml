@@ -1,0 +1,57 @@
+---
+- name: Install docker and docker-compose
+  hosts: docker_server
+  become: yes
+  tasks:
+    - name: Install docker
+      dnf:
+        name: docker
+        update_cache: yes
+        state: present
+    - name: Start docker daemon
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+    - name: Create docker cli-plugins directory
+      file:
+        path: /usr/local/lib/docker/cli-plugins
+        state: directory
+        mode: +x
+    - name: Install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v5.0.2/docker-compose-linux-x86_64
+        dest: /usr/local/lib/docker/cli-plugins/docker-compose
+        mode: +x
+
+- name: Add new user
+  hosts: docker_server
+  become: yes
+  tasks:
+    - name: Create new user
+      user:
+        name: "{{ linux_name }}"
+        groups: adm, docker
+      
+- name: Start docker containers
+  hosts: docker_server
+  become: yes
+  become_user: "{{ linux_name }}"
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Copy docker compose
+      copy:
+        src: /Users/mahtazare/Documents/docker-compose.yaml
+        dest: "{{ user_home_dir }}/docker-compose.yaml"
+    - name: Docker login
+      community.docker.docker_login:
+        username: mahtazare
+        password: "{{docker_password}}"
+    - name: Start containers with docker compose
+      community.docker.docker_compose_v2:
+        project_src: "{{ user_home_dir }}"
+
+
+
+  
