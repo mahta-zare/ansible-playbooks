@@ -12,13 +12,20 @@
       systemd:
         name: docker
         state: started
-    - name: Find architecture
-      command: uname -m
-      register: arch
+        enabled: yes
+    # - name: Find architecture
+    #   command: uname -m
+    #   register: arch
+    - name: Create docker cli-plugins directory
+      file:
+        path: /usr/local/lib/docker/cli-plugins
+        state: directory
+        mode: +x
     - name: Install docker-compose
       get_url:
-        url: https://github.com/docker/compose/releases/download/v5.0.2/docker-compose-linux-{{ arch.stdout }}
-        dest: /usr/local/bin/docker-compose
+        # url: https://github.com/docker/compose/releases/download/v5.0.2/docker-compose-linux-{{ arch.stdout }}
+        url: https://github.com/docker/compose/releases/download/v5.0.2/docker-compose-linux-x86_64
+        dest: /usr/local/lib/docker/cli-plugins/docker-compose
         mode: +x
 
 - name: Add ec2-user to docker group
@@ -32,3 +39,32 @@
         append: yes
     - name: Reconnect to server
       meta: reset_connection
+
+# - name: Test docker pull
+#   hosts: docker_server
+#   tasks: 
+#     - name: Pull redis
+#       community.docker.docker_image: 
+#         name: redis
+#         source: pull
+      
+- name: Start docker containers
+  hosts: docker_server
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Copy docker compose
+      copy:
+        src: /Users/mahtazare/Documents/Learning/devops_bootcamp/developing-with-docker/docker-compose-mahta.yaml
+        dest: /home/ec2-user/docker-compose.yaml
+    - name: Docker login
+      community.docker.docker_login:
+        username: mahtazare
+        password: "{{docker_password}}"
+    - name: Start containers with docker compose
+      community.docker.docker_compose_v2:
+        project_src: /home/ec2-user
+
+
+
+  
