@@ -1,0 +1,34 @@
+---
+- name: Install docker and docker-compose
+  hosts: docker_server
+  become: yes
+  tasks:
+    - name: Install docker
+      dnf:
+        name: docker
+        update_cache: yes
+        state: present
+    - name: Start docker daemon
+      systemd:
+        name: docker
+        state: started
+    - name: Find architecture
+      command: uname -m
+      register: arch
+    - name: Install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v5.0.2/docker-compose-linux-{{ arch.stdout }}
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+
+- name: Add ec2-user to docker group
+  hosts: docker_server
+  become: yes
+  tasks:
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+    - name: Reconnect to server
+      meta: reset_connection
