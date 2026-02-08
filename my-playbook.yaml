@@ -1,0 +1,12 @@
+---
+- name: Configure nginx web server
+  hosts: droplet
+  tasks:
+  - name: uninstall nginx web server
+    apt:
+      name: nginx=1.18*
+      state: absent
+  - name: stop nginx web server
+    service:
+      name: nginx
+      state: stopped 

@@ -1,0 +1,10 @@
+# Ansible Variables
+# Copy this file to project-vars and fill in your values
+
+linux_name: your_username
+location: /path/to/your/application/files
+version: 1.0.0
+user_home_dir: /home/{{linux_name}}
+
+docker_password: your_docker_password_here
+

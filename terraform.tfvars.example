@@ -1,0 +1,12 @@
+# Terraform Variables
+# Copy this file to terraform.tfvars and fill in your values
+
+vpc_cidr_block = "10.0.0.0/16"
+subnet_1_cidr_block = "10.0.10.0/24"
+avail_zone = "ca-west-1a"
+env_prefix = "dev"
+my_ip = "YOUR_IP_ADDRESS/32"  # Replace with your IP address
+instance_type = "t3.micro"
+public_key_location = "/path/to/your/.ssh/id_rsa.pub"
+private_key_location = "/path/to/your/.ssh/id_rsa"
+

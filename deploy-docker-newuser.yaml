@@ -1,6 +1,20 @@
 ---
+- name: Wait for ssh connection
+  hosts: all
+  tasks:
+    - name: Ensure ssh is open
+      wait_for:
+        port: 22
+        delay: 10
+        timeout: 100
+        search_regex: OpenSSH
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+      vars:
+        ansible_connection: local
+        
+
 - name: Install docker and docker-compose
-  hosts: docker_server
+  hosts: all
   become: yes
   tasks:
     - name: Install docker
@@ -25,7 +39,9 @@
         mode: +x
 
 - name: Add new user
-  hosts: docker_server
+  hosts: all
+  vars_files:
+  - project-vars
   become: yes
   tasks:
     - name: Create new user
@@ -34,11 +50,11 @@
         groups: adm, docker
       
 - name: Start docker containers
-  hosts: docker_server
-  become: yes
-  become_user: "{{ linux_name }}"
+  hosts: all
   vars_files:
     - project-vars
+  become: yes
+  become_user: "{{ linux_name }}"
   tasks:
     - name: Copy docker compose
       copy:
